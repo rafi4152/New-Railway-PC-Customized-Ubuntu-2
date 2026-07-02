@@ -1,9 +1,19 @@
 FROM ubuntu:24.04
 
-# Stop interactive prompts during installation
+# Stop interactive prompts
 ENV DEBIAN_FRONTEND=noninteractive
 ENV USER=root
 ENV HOME=/root
+
+# Install locales and set default language to English US
+RUN apt-get update && apt-get install -y locales \
+    && locale-gen en_US.UTF-8 \
+    && update-locale LANG=en_US.UTF-8
+
+# Force Environment variables to English US
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US:en
+ENV LC_ALL=en_US.UTF-8
 
 # Update and install lightweight GUI, VNC, noVNC and basic tools
 RUN apt-get update && apt-get install -y \
@@ -20,9 +30,9 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Set up VNC config & startup script
+# Set up VNC config & startup script (Force English in VNC session too)
 RUN mkdir -p $HOME/.vnc \
-    && echo "#!/bin/bash\nstartxfce4 &" > $HOME/.vnc/xstartup \
+    && echo "#!/bin/bash\nexport LANG=en_US.UTF-8\nstartxfce4 &" > $HOME/.vnc/xstartup \
     && chmod +x $HOME/.vnc/xstartup
 
 # Set VNC password (Password: railway)
